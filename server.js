@@ -1,8 +1,10 @@
 const express = require('express');
 const bodyP = require('body-parser');
+const cors = require('cors');
 const app = express();
 
 app.use(bodyP.json());
+app.use(cors());
 
 const db = {
     users: [
@@ -87,4 +89,4 @@ app.put('/image', (req, res) => {
 })
 
 
-app.listen(process.env.PORT || 3000 , () => console.log(`Server running ...`));
+app.listen(process.env.PORT || 3001, () => console.log(`Server running ...`));
