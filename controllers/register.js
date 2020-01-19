@@ -1,15 +1,18 @@
 const handleRegister = db => (req, res) => {
     const { email, name, password } = req.body;
-    db.users.push(
+    db('users')
+    .returning('*')
+    .insert(
         {
-            id: '126', //This should be an incremental key when you using a database, most of the time can be a primary key of table, but just a example...
-            name: name,
             email: email,
-            password: password, //in the future this gonna be a hashkey, never grab password harcoded!
-            counter: 0,
-            registered: new Date()
+            name: name,
+            joined: new Date()
         }
     )
+    .then(user => {
+        res.json(user[0]);
+    })
+    .catch(err => res.status(400).json('Unable to register the new user'))
     res.json(db.users[db.users.length-1]);
 }
 

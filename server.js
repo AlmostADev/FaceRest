@@ -47,12 +47,12 @@ const pg = knex({
     connection: {
       host : '127.0.0.1',
       user : 'postgres',
-      password : '12345',
+      password : '1234',
       database : 'faceRecog'
     }
 });
 
-console.log(pg.select('*').from('users'));
+pg.select('*').from('users').then(data => console.log(data));
 
 app.get('/', (req, res) => {
     res.json(db.users);
@@ -60,7 +60,7 @@ app.get('/', (req, res) => {
 
 //API endpoints using dependency injection, it's a way more cleaner to do this ...
 app.post('/signin',signin.handleSignIn(db))
-app.post('/register', register.handleRegister(db)) 
+app.post('/register', register.handleRegister(pg)) 
 app.get('/profile/:id', profile.handleProfile(db))
 app.put('/image', image.handleImage(db))
 
