@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyP = require('body-parser');
 const cors = require('cors');
+const knex = require('knex');
 const app = express();
 
 //controllers
@@ -40,6 +41,18 @@ const db = {
         }
     ]
 }
+
+const pg = knex({
+    client: 'pg',
+    connection: {
+      host : '127.0.0.1',
+      user : 'postgres',
+      password : '12345',
+      database : 'faceRecog'
+    }
+});
+
+console.log(pg.select('*').from('users'));
 
 app.get('/', (req, res) => {
     res.json(db.users);
