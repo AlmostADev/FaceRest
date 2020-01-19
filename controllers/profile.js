@@ -1,15 +1,11 @@
 const handleProfile = db => (req, res) => {
     const { id } = req.params;
-    let found = false;
-    db.users.forEach(user => {
-        if (user.id === id) {
-            found = true;
-            return res.json(user);
-        }
+    db.select('*').from('users').where({id})
+    .then(user => {
+        user.length ? res.json(user[0]) : res.status(400).json('User not  found!');
     })
-    if(!found) {
-        res.status(404).json('user not found');
-    }
+    .catch(err => res.status(400).json('There is a problem with the user requested'))
+
 }
 
 module.exports = {

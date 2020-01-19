@@ -55,13 +55,16 @@ const pg = knex({
 pg.select('*').from('users').then(data => console.log(data));
 
 app.get('/', (req, res) => {
-    res.json(db.users);
+    pg.select('*')
+    .from('users')
+    .then(data => res.json(data));
+    
 })
 
 //API endpoints using dependency injection, it's a way more cleaner to do this ...
 app.post('/signin',signin.handleSignIn(db))
 app.post('/register', register.handleRegister(pg)) 
-app.get('/profile/:id', profile.handleProfile(db))
-app.put('/image', image.handleImage(db))
+app.get('/profile/:id', profile.handleProfile(pg))
+app.put('/image', image.handleImage(pg))
 
 app.listen(process.env.PORT || 3001, () => console.log(`Server running ...`));
