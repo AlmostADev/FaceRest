@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyP = require('body-parser');
 const cors = require('cors');
+const bcrypt = require('bcrypt-nodejs');
 const knex = require('knex');
 const app = express();
 
@@ -12,35 +13,6 @@ const image = require('./controllers/image');
 
 app.use(bodyP.json());
 app.use(cors());
-
-const db = {
-    users: [
-        {
-            id: '123',
-            name: 'Alejandro',
-            email: 'alejandro@mail.com',
-            password: '123',
-            counter: 0,
-            registered: new Date()
-        },
-        {
-            id: '124',
-            name: 'Karina',
-            email: 'karina@mail.com',
-            password: '124',
-            counter: 0,
-            registered: new Date()
-        },
-        {
-            id: '125',
-            name: 'Tamara',
-            email: 'tamara@mail.com',
-            password: '125',
-            counter: 0,
-            registered: new Date()
-        }
-    ]
-}
 
 const pg = knex({
     client: 'pg',
@@ -54,16 +26,11 @@ const pg = knex({
 
 pg.select('*').from('users').then(data => console.log(data));
 
-app.get('/', (req, res) => {
-    pg.select('*')
-    .from('users')
-    .then(data => res.json(data));
-    
-})
+app.get('/', (req, res) => pg.select('*').from('users').then(data => res.json(data)))
 
 //API endpoints using dependency injection, it's a way more cleaner to do this ...
-app.post('/signin',signin.handleSignIn(db))
-app.post('/register', register.handleRegister(pg)) 
+app.post('/signin',signin.handleSignIn(pg, bcrypt))
+app.post('/register', register.handleRegister(pg, bcrypt)) 
 app.get('/profile/:id', profile.handleProfile(pg))
 app.put('/image', image.handleImage(pg))
 

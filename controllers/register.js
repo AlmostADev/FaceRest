@@ -1,19 +1,31 @@
-const handleRegister = db => (req, res) => {
+const handleRegister = (db, bcrypt) => (req, res) => {
     const { email, name, password } = req.body;
-    db('users')
-    .returning('*')
-    .insert(
-        {
-            email: email,
-            name: name,
-            joined: new Date()
-        }
-    )
-    .then(user => {
-        res.json(user[0]);
+    const hashPassword = bcrypt.hashSync(password);
+    db.transaction(logTX => {
+        logTX.insert({
+            hash: hashPassword,
+            email: email
+        })
+        .into('login')
+        .returning('email')
+        .then(emailLog => {
+            return logTX('users')
+            .returning('*')
+            .insert(
+                {
+                    email: emailLog[0],
+                    name: name,
+                    joined: new Date()
+                }
+            )
+            .then(user => {
+                res.json(user[0]);
+            })
+        })
+        .then(logTX.commit)
+        .catch(logTX.rollback)
     })
     .catch(err => res.status(400).json('Unable to register the new user'))
-    res.json(db.users[db.users.length-1]);
 }
 
 module.exports = {
